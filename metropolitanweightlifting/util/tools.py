@@ -57,7 +57,7 @@ class LastUpdatedOrderedDict(OrderedDict):
 
 def markdown_to_html(text):
     # leave '>' for blockquotes
-    text = str(escape(text)).replace('&gt;', '>')
+    text = str(escape(text).encode('ascii', 'ignore')).replace('&gt;', '>')
     m = Markdown()
     return m.convert(text)
 
