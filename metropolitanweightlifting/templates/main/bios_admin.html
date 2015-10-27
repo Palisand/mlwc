@@ -1,0 +1,119 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1><a href="{{ url_for('bios') }}">Athletes</a> - {{ type }}</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+{% if current_user.is_authenticated() %}
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.usa_id.label }} {{ form.usa_id(size=10) }}
+            {% if form.usa_id.errors %}
+                {% for error in form.usa_id.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </p>
+        <div style="text-align: right; font-size: 12px; float: right;">
+            * This is optional if Weight Class is not set to 'Auto'
+        </div>
+        <div style="padding: 0.5em; border: 1px solid rgba(0, 0, 0, 0.2);">
+            <div>
+                <ul class="form-field-list">
+                    <li>{{ form.firstname.label }}</li>
+                    <li>{{ form.firstname(size=20) }}</li>
+                    {% if form.firstname.errors %}
+                        {% for error in form.firstname.errors %}
+                            <li class="form-error">{{ error }}</li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <ul class="form-field-list">
+                    <li>{{ form.lastname.label }}</li>
+                    <li>{{ form.lastname(size=20) }}</li>
+                    {% if form.lastname.errors %}
+                        {% for error in form.lastname.errors %}
+                            <li class="form-error">{{ error }}</li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <ul class="form-field-list">
+                    <li>{{ form.gender.label }}</li>
+                    <li>{{ form.gender }}</li>
+                </ul>
+            </div>
+            <div>
+                <ul class="form-field-list">
+                    <li>{{ form.weight.label }}*</li>
+                    <li>{{ form.weight(size=6) }} {{ form.weight_unit }}</li>
+                    {% if form.weight.errors %}
+                        {% for error in form.weight.errors %}
+                            <li class="form-error">{{ error }}</li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <ul class="form-field-list">
+                    <li>{{ form.weight_class_male.label }}</li>
+                    <li>{{ form.weight_class_female.label }}</li>
+                    <li>{{ form.weight_class_male }}</li>
+                    <li>{{ form.weight_class_female }}</li>
+                </ul>
+                <ul class="form-field-list">
+                    <li>{{ form.snatch.label }}</li>
+                    <li>{{ form.snatch(size=4) }} {{ form.snatch_unit }}</li>
+                    {% if form.snatch.errors %}
+                        {% for error in form.snatch.errors %}
+                            <li class="form-error">{{ error }}</li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <ul class="form-field-list">
+                    <li>{{ form.clean_jerk.label }}</li>
+                    <li>{{ form.clean_jerk(size=4) }} {{ form.clean_jerk_unit }}</li>
+                    {% if form.clean_jerk.errors %}
+                        {% for error in form.clean_jerk.errors %}
+                            <li class="form-error">{{ error }}</li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+            <p style="border-bottom: 1px solid rgba(0, 0, 0, 0.2); font-size: 12px; color: rgba(0, 0, 0, 0.5);">
+                OPTIONAL
+            </p>
+            <div>
+                {% if type == 'Edit' and athlete.has_photo %}
+                    <img src="{{ url_for('static', filename='image/athletes/' ~ athlete.id ~ '_normal.jpg') }}" height="120" width="120">
+                {% else %}
+                    <img src="{{ url_for('static', filename='image/athletes/default_normal.jpg') }}" height="120" width="120">
+                {% endif %}
+                <ul class="form-field-list">
+                    <li>{{ form.photo.label }}</li>
+                    <li>{{ form.photo }}</li>
+                    {% if form.photo.errors %}
+                        {% for error in form.photo.errors %}
+                            <span class="form-error">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+            <div>
+                {{ form.description.label }}
+                <span class="bio-form-textarea">{{ form.description(rows=3) }}</span>
+            </div>
+        </div>
+        <input type="submit" value="Submit" style="margin-top: 1em;">
+    </form>
+{% endif %}
+
+{% endblock %}

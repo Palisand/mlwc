@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>Meets</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+{% if current_user.is_authenticated() %}
+    <form method="POST" action="{{ url_for('results') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div>{{ form.csv_file.label }}</div>
+        <ul style="list-style-type: none; padding-left: 0.5em; margin-top: 0;">
+            <li>{{ form.csv_file }}</li>
+            {% for error in form.csv_file.errors %}
+                <li class="form-error">{{ error }}</li>
+            {% endfor %}
+            <li>{{ form.update_athletes }} <small>{{ form.update_athletes.label }}</small></li>
+            <li><input type="submit" value="Submit"></li>
+        </ul>
+    </form>
+    <div>
+        <div>CSV File Format</div>
+        <ul style="font-size: 0.75em;">
+            <li>Do not include line numbers.</li>
+            <li>'date' should be human readable (ex: 'December 21, 2012').</li>
+            <li>Lines 5 and on are identical to typical USA Weightlifting Meet result rows.</li>
+        </ul>
+        <ol style="padding-top: 1em; padding-bottom: 1em; border: 1px dashed black; font-size: 0.75em; font-family: Courier, monospace;">
+            <li>
+                sanction number
+                <a href="http://www.teamusa.org/usa-weightlifting/resources/all-meet-results" target="_blank">
+                    http://www.teamusa.org/usa-weightlifting/resources/all-meet-results
+                </a>
+            </li>
+            <li>name</li>
+            <li>date</li>
+            <li>city, state</li>
+            <li>lot number, gender, member id, division, weight class, name, year of birth, team, body weight, snatch 1, 2, 3, best, clean and jerk 1, 2, 3, best, total, place</li>
+            <li>...</li>
+        </ol>
+    </div>
+{% endif %}
+
+<form id="meets-filter" method="GET" action="{{ url_for('results') }}">
+    {{ filter_form.year.label }} {{ filter_form.year }}
+</form>
+
+<ul style="list-style-type: none; padding-left: 1em;">
+    {% for meet in meets %}
+        <li style="overflow: hidden;">
+            <div style="float: left">
+                {{ meet.date }}
+            </div>
+            <div style="overflow: hidden; padding-left: 1em">
+                <a href="{{ url_for('results', meet_id=meet.id) }}">{{ meet.name }}</a>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

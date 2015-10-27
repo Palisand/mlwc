@@ -1,0 +1,63 @@
+<div class="section group" style="background-color: rgb(54, 57, 105); color: white;">
+    <div class="col span_1_of_12">
+
+    </div>
+    <div class="col span_3_of_12">
+        Name
+    </div>
+    <div class="col span_2_of_12">
+        Total
+    </div>
+    <div class="col span_2_of_12">
+        Snatch
+    </div>
+    <div class="col span_2_of_12">
+        C & J
+    </div>
+    <div class="col span_2_of_12">
+        Weight
+    </div>
+</div>
+
+{% for weight_class, rankings in results[gender].iteritems() if not weight_classes or weight_class in weight_classes %}
+    <div class="section group" style="background-color: rgb(54, 57, 105);">
+        <div class="col span_12_of_12" style="margin-left: 0.5em; color: white;">
+            {{ weight_class }} kg
+        </div>
+    </div>
+
+    <div class="alt-colors">
+        {% for rank in rankings %}
+            <div class="section group dropdown-info">
+                <div class="col span_1_of_12" style="text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ rank.place | human_place }}
+                </div>
+                <div class="col span_3_of_12">
+                    {{ rank.name }}
+                </div>
+                <div class="col span_2_of_12">
+                    {{ rank.total }}
+                </div>
+                <div class="col span_2_of_12">
+                    {{ rank.snatch_best }}
+                    <ol class="info">
+                        <li>{{ rank.snatch_1 }}</li>
+                        <li>{{ rank.snatch_2 }}</li>
+                        <li>{{ rank.snatch_3}}</li>
+                    </ol>
+                </div>
+                <div class="col span_2_of_12">
+                    {{ rank.clean_jerk_best }}
+                    <ol class="info">
+                        <li>{{ rank.clean_jerk_1 }}</li>
+                        <li>{{ rank.clean_jerk_2 }}</li>
+                        <li>{{ rank.clean_jerk_3 }}</li>
+                    </ol>
+                </div>
+                <div class="col span_2_of_12">
+                    {{ rank.body_weight }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}

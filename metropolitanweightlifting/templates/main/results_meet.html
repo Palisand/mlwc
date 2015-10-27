@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1><a href="{{ url_for('results') }}">Meets</a> / {{ meet.name }}</h1>
+<p>{{ meet.date.strftime("%B %d, %Y") }} • {{ meet.city }}, {{ meet.state }}</p>
+
+{% if current_user.is_authenticated() %}
+    <button style="float: right;" form="delete_meet" onclick="deleteMeet('{{ meet.name }}', {{ meet.id }}, this)" type="button">Delete</button>
+    <form hidden id="delete_meet" method="POST">
+        {{ delete_form.hidden_tag() }}
+        {{ delete_form.meet_id }}
+    </form>
+{% endif %}
+
+<form id="results-filter" method="GET">
+    {{ form.gender.label }} {{ form.gender }}
+    {{ form.weight_class.label }} {{ form.weight_class }}
+</form>
+
+{% include "main/res.html" %}
+
+{% endblock %}

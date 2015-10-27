@@ -1,0 +1,28 @@
+<ul>
+    {% if current_user.is_authenticated() %}
+        <li {% if request.path == url_for('login') %} class="active" {% endif %}>
+            <a href="{{ url_for('login') }}">{{ current_user.username }}</a>
+        </li>
+    {% endif %}
+    <li {% if request.path == url_for('index') %} class="active" {% endif %}>
+        <a href="{{ url_for('index') }}">Latest News</a>
+    </li>
+    <li {% if request.path == url_for('calendar') %} class="active" {% endif %}>
+        <a href="{{ url_for('calendar') }}">Event Calendar</a>
+    </li>
+    <li {% if 'results' in request.path and not page_error %} class="active" {% endif %}>
+        <a href="{{ url_for('results') }}">Meet Results</a>
+    </li>
+    <li {% if 'article' in request.path and not page_error %} class="active" {% endif %}>
+        <a href="{{ url_for('articles') }}">Articles</a>
+    </li>
+    <li {% if 'minutes' in request.path and not page_error %} class="active" {% endif %}>
+        <a href="{{ url_for('minutes') }}">Meeting Minutes</a>
+    </li>
+    <li {% if request.path == url_for('bylaws') %} class="active" {% endif %}>
+        <a href={{ url_for('bylaws') }}>Bylaws</a>
+    </li>
+    <li {% if 'bio' in request.path and not page_error %} class="active" {% endif %}>
+        <a href="{{ url_for('bios') }}">Athlete Bios</a>
+    </li>
+</ul>

@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>Athletes</h1>
+
+<div class="section group" style="text-align: center;">
+    <div class="col span_6_of_12" style="text-align: left;">
+       {% if current_user.is_authenticated() %}
+            <a href="{{ url_for('add_bio') }}">Add New</a>
+            <form hidden id="delete_athlete" method="POST" action="{{ url_for('bios') }}">
+                {{ delete_form.hidden_tag() }}
+                {{ delete_form.athlete_id }}
+            </form>
+        {% endif %}
+    </div>
+    <div class="col span_2_of_12">
+        Snatch
+    </div>
+    <div class="col span_2_of_12">
+        C & J
+    </div>
+    <div class="col span_2_of_12">
+        Wt. Class
+    </div>
+</div>
+{% for athlete in athletes %}
+    <a class="anchor" id="{{ athlete.id }}"></a>
+    <div class="section group roster roster-main" onclick="toggleAthleteDetails({{ athlete.id }})">
+        <div class="col span_6_of_12">
+            <div style="margin-left: 1em;">
+                <div id="{{ athlete.id }}_image" class="athlete-thumbnail">
+                    {% if athlete.has_photo %}
+                        <img class="wrap-left" src="{{ url_for('static', filename='image/athletes/' ~ athlete.id ~ '_small.jpg') }}">
+                    {% else %}
+                        <img class="wrap-left" src="{{ url_for('static', filename='image/athletes/default_small.jpg') }}">
+                    {% endif %}
+                </div>
+                <div style="text-align: left; overflow: hidden;">
+                    {{ athlete.firstname }} {{ athlete.lastname }}
+                </div>
+            </div>
+        </div>
+        <div class="col span_2_of_12">
+            {{ athlete.snatch }}
+        </div>
+        <div class="col span_2_of_12">
+            {{ athlete.clean_jerk }}
+        </div>
+        <div class="col span_2_of_12">
+            {{ athlete.weight_class }}
+        </div>
+    </div>
+    <div id="{{ athlete.id }}_details" class="section group roster roster-details">
+        <div class="col span_12_of_12">
+            <div style="margin-left: 1em;">
+                {% if athlete.has_photo %}
+                    <img class="wrap-left" src="{{ url_for('static', filename='image/athletes/' ~ athlete.id ~ '_normal.jpg') }}" height="120" width="120">
+                {% else %}
+                    <img class="wrap-left" src="{{ url_for('static', filename='image/athletes/default_normal.jpg') }}" height="120" width="120">
+                {% endif %}
+            </div>
+            {% if current_user.is_authenticated() %}
+                <div style="text-align: left; margin-bottom: 1em;">
+                    <a href="{{ url_for('edit_bio', athlete_id=athlete.id) }}"><button type="button">Edit</button></a>
+                    <button form="delete_athlete" onclick="deleteAthlete('{{ athlete.firstname }} {{ athlete.lastname }}', {{ athlete.id }}, this)" type="button">Delete</button>
+                </div>
+            {% endif %}
+            <div style="text-align: left; margin-right: 1em; overflow: hidden;">
+                {{ athlete.description }}
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+{% endblock %}

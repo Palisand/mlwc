@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated() %}
+
+    <h1>{{ current_user.firstname | title }} {{ current_user.lastname | title }}</h1>
+
+    <p><a href="{{ url_for('admin.index') }}">Admin Page</a></p>
+    <ul style="list-style-type: none; padding: 0;">
+        <li>Add new:</li>
+        <ul>
+            {# banners #}
+            <li><a href="{{ url_for('results') }}">Meet Result</a></li>
+            <li><a href="{{ url_for('add_article') }}">Articles</a></li>
+            {#  meeting minutes #}
+            <li><a href="{{ url_for('add_bio') }}">Athlete Bios</a></li>
+        </ul>
+    </ul>
+    <p><a href="{{ url_for('change_password') }}">Change Your Password</a><br></p>
+    <p><a href="{{ url_for('logout') }}">Logout</a></p>
+
+{% else %}
+
+    <h1>Admin Login</h1>
+
+    <form method="POST" action="{{ url_for('login') }}">
+        {{ form.hidden_tag() }}
+        <ul style="list-style-type: none; padding: 0">
+            <li>{{ form.username.label }}</li>
+            <li>
+                {% if form.username.errors %}
+                    <span class="form-error">{{ form.username(size=20) }}</span>
+                    {% for error in form.username.errors %}
+                        <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                {% else %}
+                    {{ form.username(size=20) }}
+                {% endif %}
+            </li>
+            <li>{{ form.password.label }}</li>
+            <li>
+                {% if form.password.errors %}
+                    <span class="form-error">{{ form.password(size=20) }}</span>
+                    {% for error in form.password.errors %}
+                        <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                {% else %}
+                    {{ form.password(size=20) }}
+                {% endif %}
+            </li>
+            <li style="margin-top: 1em;">
+                {{ form.remember }}  <small>{{ form.remember.label }}</small>
+            </li>
+        </ul>
+        <input type="submit" value="Go">
+    </form>
+
+    {% if login_error %}
+        <p class="form-error">{{ login_error }}</p>
+    {% endif %}
+
+{% endif %}
+
+{% endblock %}

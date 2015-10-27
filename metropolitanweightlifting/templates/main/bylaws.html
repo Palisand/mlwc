@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <h1>Bylaws</h1>
+    {% for (article, section) in contents.iteritems() %}
+        <div>
+            <a href="#article_{{ loop.index }}">Article {{ loop.index }}. {{ article }}</a>
+        </div>
+    {% endfor %}
+
+    {% for (article, sections) in contents.iteritems() %}
+        <a class="anchor" id="article_{{ loop.index }}"></a>
+        <h3>Article {{ loop.index }}. {{ article }}</h3>
+        {% for (title, description) in sections.iteritems() %}
+            <p>
+                <span style="text-decoration: underline;">
+                    Section {{ loop.index }}: {{ title }}
+                </span><br>
+                {{ description | safe }}
+            </p>
+        {% endfor %}
+    {% endfor %}
+
+{% endblock %}

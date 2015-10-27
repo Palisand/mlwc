@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>Upcoming Events</h1>
+{% if upcoming_events %}
+    {% for event in upcoming_events %}
+        <div class="event">
+            <a href="{{ event.htmlLink }}" target="_blank">
+                <div class="section group">
+                    <div class="col span_2_of_12 event-date">
+                        {% if event.start.date %}
+                            {{ event.start.date | human_uDate("%d") }}<br>
+                            {{ event.start.date | human_uDate("%b") }}
+                        {% elif event.start.dateTime %}
+                            {{ event.start.dateTime | human_rfc3339("%d") }}<br>
+                            {{ event.start.dateTime | human_rfc3339("%b") }}
+                        {% endif %}
+                    </div>
+                    <div class="col span_10_of_12">
+                        <div class="event-heading">
+                            {{ event.summary | upper }}
+                        </div>
+                        {% if event.location %}
+                            <div class="event-location">
+                                {{ event.location }}
+                            </div>
+                        {% endif %}
+                        {% if event.description %}
+                            <div class="event-description">
+                                {{ event.description }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>None</p>
+{% endif %}
+
+{% if article %}
+    <h1>
+        <a href="{{ url_for('articles', article_id=article.id) }}">
+            {{ article.title }}
+        </a>
+    </h1>
+    {% include "main/art.html" %}
+{% endif %}
+
+{% if latest_meet %}
+    <h1>Latest Meet</h1>
+    <h2>
+        {{ latest_meet.date }} :
+        <a href="{{ url_for('results', meet_id=latest_meet.id) }}">
+            {{ latest_meet.name }}
+        </a>
+    </h2>
+{% endif %}
+
+{% endblock %}

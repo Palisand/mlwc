@@ -1,0 +1,111 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<h1><a href="{{ url_for('articles') }}">Articles</a> - {{ type }}</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+{% if current_user.is_authenticated() and delete_form %}
+    <form hidden id="delete_article_image" method="POST">
+        {{ delete_form.hidden_tag() }}
+        {{ delete_form.article_image_id }}
+    </form>
+{% endif %}
+
+{% if current_user.is_authenticated() %}
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.type.label }}{{ form.type }}
+        </p>
+        <div class="full-width">
+            {{ form.title.label }}
+            {% if form.title.errors %}
+                <span class="form-error">
+                    {% for error in form.title.errors %}
+                        {{ error }}
+                    {% endfor %}
+                    {{ form.title }}
+                </span>
+            {% else %}
+                {{ form.title }}
+            {% endif %}
+        </div>
+        <div class="full-width">
+            {{ form.body.label }}
+            {% if form.body.errors %}
+                <span class="form-error">
+                    {% for error in form.body.errors %}
+                        {{ error }}
+                    {% endfor %}
+                    {{ form.body(rows=10) }}
+                </span>
+            {% else %}
+                {{ form.body(rows=10) }}
+            {% endif %}
+        </div>
+        <div>
+            {{ form.images.label }} {{ form.images(multiple="") }}
+            {% if form.images.errors %}
+                <ul style="list-style-type: none; padding: 0; margin-top: 0;">
+                    {% for error in form.images.errors %}
+                        <li class="form-error">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <span style="float: right">
+                {{ form.wrap_text }}
+                {{ form.wrap_text.label }}
+            </span>
+            <div id="img_captions">
+                <div class="full-width">
+                    {{ form.img_caption_0.label }}
+                    {{ form.img_caption_0 }}
+                </div>
+            </div>
+            <div class="full-width">
+                {% if type == 'Edit' and article.images.first() %}
+                    {% for image in form.article.images %}
+                        <div style="margin-top: 1em; text-align: center;">
+                            <img class="to-fullsize" style="max-height: 100px;"
+                                 src="{{ url_for('static', filename='image/articles/' + image.src) }}">
+                        </div>
+                        {% with caption_id = "img_existing_caption_" ~ image.id %}
+                            <button style="float: right" form="delete_article_image"
+                                    onclick="deleteArticleImage('{{ image.src }}', {{ image.id }}, this);"
+                                    type="button">Delete</button>
+                            <label for="{{ caption_id }}">Caption for '{{ image.src }}'</label>
+                            <input id="{{ caption_id }}"
+                                   name="{{ caption_id }}" type="text" value="{{ image.caption }}">
+                        {% endwith %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="full-width">
+            {{ form.video_src.label }}
+            {% if form.video_src.errors %}
+                <span class="form-error">
+                    {% for error in form.video_src.errors %}
+                        {{ error }}
+                    {% endfor %}
+                    {{ form.video_src }}
+                </span>
+            {% else %}
+                {{ form.video_src }}
+            {% endif %}
+        </div>
+        <input type="submit" value="Submit" style="margin-top: 1em;">
+    </form>
+{% endif %}
+
+{% endblock %}

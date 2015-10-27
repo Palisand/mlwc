@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<h1><a href="{{ url_for('articles') }}">Articles</a> / {{ article.title }}</h1>
+
+<div style="margin-top: -1em; margin-bottom: 1em;">
+    <small>{{ article.created_at.strftime('%B %d, %Y') }}</small>
+    {% if current_user.is_authenticated() %}
+        <button style="float: right;" form="delete_article" onclick="deleteArticle('{{ article.title }}', {{ article.id }}, this)" type="button">Delete</button>
+        <a href="{{ url_for('edit_article', article_id=article.id) }}">
+            <button type="button" style="float: right;">Edit</button>
+        </a>
+        <form hidden id="delete_article" method="POST">
+            {{ delete_form.hidden_tag() }}
+            {{ delete_form.article_id }}
+        </form>
+    {% endif %}
+</div>
+
+{% include "main/art.html" %}
+
+{% endblock %}

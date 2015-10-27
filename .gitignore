@@ -1,0 +1,4 @@
+.idea/
+.static/image/
+*.pyc
+*.DS_STORE

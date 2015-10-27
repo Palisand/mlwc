@@ -1,0 +1,20 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+    {% if current_user.is_authenticated() %}
+        <h1>Welcome {{ current_user.firstname }} {{ current_user.lastname }}</h1>
+        <p class="lead">
+            You may use this to <strong>read</strong>, <strong>edit</strong>, and <strong>delete</strong> records from the database.<br>
+            To <strong>create</strong> records, please use the forms provided on the main site.
+        </p>
+        <a href="{{ url_for('login') }}" class="btn btn-default" role="button">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> Back to Metropolitan Weightlifting
+        </a>
+    {% else %}
+        <p>
+            Looks like you're not logged in.
+            If you want to access this page, login
+            <a href="{{ url_for('login') }}">here</a>.
+        </p>
+    {% endif %}
+{% endblock %}
