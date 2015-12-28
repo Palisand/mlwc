@@ -151,11 +151,13 @@ class AddArticleForm(Form):
     images = FileField('Add Image(s)')
     img_caption_0 = StringField('Caption', validators=[Optional()])
     video_src = StringField('Youtube Video Source or Embed Code')
+    pdf = FileField('PDF File')
     body = TextAreaField('Body')
     type = SelectField('Type', choices=[
         ('text_only', 'Text Only'),
         ('images', 'Image(s)'),
         ('video', 'Video'),
+        ('pdf', 'PDF')
     ])
     wrap_text = BooleanField('Wrap Text')
 
@@ -180,6 +182,7 @@ class AddArticleForm(Form):
             'text_only': self.body,
             'images': self.images,
             'video': self.video_src,
+            'pdf': self.pdf
         }
         required_field = type_to_required_field[self.type.data]
         if not required_field.data:
@@ -188,7 +191,10 @@ class AddArticleForm(Form):
             else:
                 required_field.errors.append('This field is required.')
 
-        if not base_validate or self.body.errors or self.images.errors or self.video_src.errors:
+        if required_field == self.pdf and 'pdf' not in str(self.pdf.data.mimetype):
+            required_field.errors.append('Invalid file format.')
+
+        if not base_validate or required_field.errors: # self.body.errors or self.images.errors or self.video_src.errors or self.pdf.errors:
             return False
 
         if not self.body.data:

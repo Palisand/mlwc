@@ -5,21 +5,25 @@ from flask.ext.login import current_user
 from flask import url_for, redirect
 import datetime
 
+# TODO: install and use alembic to deal with migrations involving a lot of data
+
 
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.Enum('text_only', 'images', 'video'), nullable=False)
+    type = db.Column(db.Enum('text_only', 'images', 'video', 'pdf'), nullable=False)
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.Text)
     video_src = db.Column(db.String)
+    pdf_src = db.Column(db.String)
     wrap_text = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
 
-    def __init__(self, type, title, body, video_src, wrap_text):
+    def __init__(self, type, title, body, video_src, pdf_src, wrap_text):
         self.type = type
         self.title = title
         self.body = body
         self.video_src = video_src
+        self.pdf_src = pdf_src
         self.wrap_text = wrap_text
 
     def __repr__(self):

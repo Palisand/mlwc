@@ -17,7 +17,13 @@
                 {{ article.created_at.strftime('%Y-%m-%d') }}
             </div>
             <div style="overflow: hidden; padding-left: 1em">
-                <a href="{{ url_for('articles', article_id=article.id) }}">{{ article.title }}</a>
+                <a {% if article.pdf_src %}
+                    target="_blank" href="{{ url_for('static', filename='pdf/' ~ article.pdf_src) }}"
+                {% else %}
+                    href="{{ url_for('articles', article_id=article.id) }}"
+                {% endif %}>
+                    {{ article.title }}
+                </a>
             </div>
         </li>
     {% endfor %}

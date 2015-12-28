@@ -1,4 +1,6 @@
+app.db
 .idea/
 .static/image/
+.static/pdf/
 *.pyc
 *.DS_STORE

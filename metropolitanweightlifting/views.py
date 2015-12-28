@@ -11,6 +11,7 @@ from util.tools import (
     get_image_dimensions,
     get_video_source,
     ArticleImageInfo,
+    save_uploaded_pdf,
     save_article_image,
     save_athlete_images,
     remove_athlete_images,
@@ -227,6 +228,15 @@ def add_article():
             if form.images.errors:
                 return render_template('main/articles_admin.html', form=form, type='Add')
 
+        if form.type.data == 'pdf':
+            try:
+                pdf_src = save_uploaded_pdf(form.pdf.data)
+            except Exception:
+                form.pdf.errors.append("Error saving submitted PDF")
+                return render_template('main/articles_admin.html', form=form, type='Add')
+        else:
+            pdf_src = None
+
         # wrap_text check
         if len(images) == 1:
             if not can_wrap_text(images[0]):
@@ -235,7 +245,7 @@ def add_article():
             form.wrap_text.data = False
 
         if form.type.data == 'video':
-            video_src = get_video_source(form.video_src.data)
+            video_src = get_video_source(form.video_src.data)  # TODO: what happens if wrong format?
         else:
             video_src = None
 
@@ -244,6 +254,7 @@ def add_article():
             form.title.data,
             form.body.data,
             video_src,
+            pdf_src,
             form.wrap_text.data
         )
         db.session.add(article)

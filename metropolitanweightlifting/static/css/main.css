@@ -578,3 +578,9 @@ a:hover {
         /*display: none;*/
     /*}*/
 }
+
+/*  OTHER  */
+
+textarea#body {
+    resize: vertical;
+}

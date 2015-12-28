@@ -104,6 +104,17 @@
                 {{ form.video_src }}
             {% endif %}
         </div>
+        <div class="full-width">
+            {{ form.pdf.label }}
+            {{ form.pdf }}
+            {% if form.pdf.errors %}
+                <ul style="list-style-type: none; padding: 0; margin-top: 0;">
+                    {% for error in form.pdf.errors %}
+                        <li class="form-error">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
         <input type="submit" value="Submit" style="margin-top: 1em;">
     </form>
 {% endif %}

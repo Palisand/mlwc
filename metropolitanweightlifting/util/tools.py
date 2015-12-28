@@ -154,6 +154,16 @@ def remove_athlete_images(athlete):
         )
 
 
+def save_uploaded_pdf(pdf_file):
+    if not pdf_file:
+        return
+
+    filename = secure_filename(pdf_file.filename)
+    pdf_file.save(os.path.join(app.config['PDF_UPLOAD_FOLDER'], filename))
+    pdf_file.close()
+    return filename
+
+
 def save_uploaded_image(image_file, upload_dir, new_filename=None, sizes=frozenset()):
     """
     Saves given image file locally

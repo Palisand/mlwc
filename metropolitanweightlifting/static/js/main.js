@@ -182,19 +182,27 @@ function windowWidthChanges() {
 function articleTypeSwitch(articleTypeValue) {
     var images = $('#images').parent();
     var video_src = $('#video_src').parents('.full-width');
+    var pdf = $('#pdf').parents('.full-width');
     switch(articleTypeValue) {
         case 'text_only':
             images.hide();
             video_src.hide();
+            pdf.hide();
             break;
         case 'images':
             images.show();
             video_src.hide();
+            pdf.hide();
             break;
         case 'video':
             video_src.show();
             images.hide();
+            pdf.hide();
             break;
+        case 'pdf':
+            pdf.show();
+            images.hide();
+            video_src.hide();
     }
 }
 
