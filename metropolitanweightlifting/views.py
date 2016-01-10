@@ -5,8 +5,9 @@ from models import Athlete, User, Meet, MeetResult, Article, ArticleImage
 from util import events
 from util.tools import (
     get_formatted_meet_results,
-    get_meet_dict_from_csv,
+    get_meet_dict_from_excel_sheet,
     allowed_image_type,
+    allowed_excel_type,
     can_wrap_text,
     get_image_dimensions,
     get_video_source,
@@ -21,7 +22,12 @@ from util.tools import (
 )
 from flask import flash, render_template, request, redirect, url_for, session
 from flask.ext.login import current_user, login_user, logout_user, login_required
+from flask.ext import excel
+import pyexcel
+import pyexcel.ext.xls
 from werkzeug.security import generate_password_hash, check_password_hash
+
+import json
 
 
 @app.route('/')
@@ -87,73 +93,89 @@ def results(meet_id=None):
 
     form = None
     if current_user.is_authenticated():
-        form = forms.AddMeetForm()
+        form = forms.AddMeetForm(update_athletes=True)
         if request.method == 'POST' and form.validate_on_submit():
 
-            # TODO: use form.file like athlete save photo
-            csv_file = request.files.get(form.csv_file.name)
-            if csv_file and csv_file.content_type == 'text/csv':
+            excel_files = request.files.getlist("excel_files")
+            filename_to_meet_data = dict()
+            for excel_file in excel_files:  # gather information from files
+                if not allowed_excel_type(excel_file):
+                    form.excel_files.errors.append("%s : Invalid file" % excel_file.filename)
+                    continue
+                extension = excel_file.filename.split(".")[1]
+                sheet = pyexcel.get_sheet(file_type=extension, file_content=excel_file.read())
                 try:
-                    app.logger.debug('Uploading meet info csv file %s' % csv_file.filename)
-                    meet_data = get_meet_dict_from_csv(csv_file)
+                    app.logger.debug("Retrieving meet data from file '%s'" % excel_file.filename)
+                    meet_data = get_meet_dict_from_excel_sheet(sheet)
+                    filename_to_meet_data[excel_file.filename] = meet_data
                 except Exception as e:
-                    form.csv_file.errors.append('Error extracting information from file.')
-                    form.csv_file.errors.append('DETAILS: ' + str(e))
-                else:
-                    existing_meet = Meet.query.filter_by(sanction_number=meet_data['sanction_number']).first()
-                    if existing_meet:
-                        # TODO: DictDiffer() compare db result to current and UPDATE instead of REPLACE
-                        for result in existing_meet.results:
-                            db.session.delete(result)
-                        db.session.delete(existing_meet)
-                        db.session.commit()
-                        flash("REMOVED old meet %s." % existing_meet.sanction_number)
+                    form.excel_files.errors.append("%s : %s" % (excel_file.filename, e))
 
-                    meet = Meet(
-                        meet_data['sanction_number'],
-                        meet_data['name'],
-                        meet_data['date'],
-                        meet_data['city'],
-                        meet_data['state'],
-                    )
-                    db.session.add(meet)
-                    db.session.commit()
-                    flash("ADDED meet %s (%s : %s)." % (meet.sanction_number, meet.date, meet.name))
-
-                    for result in meet_data['results']:
-                        meet_result = MeetResult(
-                            result['gender'],
-                            result['member_id'],
-                            result['weight_class'],
-                            result['place'],
-                            result['name'],
-                            result['body_weight'],
-                            result['snatch_1'],
-                            result['snatch_2'],
-                            result['snatch_3'],
-                            result['snatch_best'],
-                            result['clean_jerk_1'],
-                            result['clean_jerk_2'],
-                            result['clean_jerk_3'],
-                            result['clean_jerk_best'],
-                            result['total'],
-                            meet.id,
+            if not form.excel_files.errors:  # add meet data
+                for filename, meet_data in filename_to_meet_data.iteritems():
+                    meet = Meet.query.filter_by(sanction_number=meet_data['sanction_number']).first()
+                    if not meet:  # if meet does not already exist
+                        meet = Meet(
+                            meet_data['sanction_number'],
+                            meet_data['name'],
+                            meet_data['date'],
+                            meet_data['city'],
+                            meet_data['state'],
                         )
-                        db.session.add(meet_result)
+                        db.session.add(meet)
+                        db.session.commit()
+                        flash("ADDED new meet %s (%s : %s)." % (meet.sanction_number, meet.date, meet.name))
 
-                        if form.update_athletes.data:
+                    result_count = 0
+                    for result in meet_data['results']:
+                        # check for duplicates (via Member ID)
+                        if result['member_id'] not in [res.member_id for res in meet.results]:
+                            meet_result = MeetResult(
+                                result['gender'],
+                                result['member_id'],
+                                result['weight_class'],
+                                result['place'],
+                                result['name'],
+                                result['body_weight'],
+                                result['snatch_1'],
+                                result['snatch_2'],
+                                result['snatch_3'],
+                                result['snatch_best'],
+                                result['clean_jerk_1'],
+                                result['clean_jerk_2'],
+                                result['clean_jerk_3'],
+                                result['clean_jerk_best'],
+                                result['total'],
+                                meet.id,
+                            )
+                            result_count += 1
+                            db.session.add(meet_result)
+                    if result_count:
+                        db.session.commit()
+                        flash("ADDED %s new meet results for %s ( <strong>%s : %s</strong> ) from<br>'%s'."
+                              % (result_count, meet.sanction_number, meet.date, meet.name, filename))
+                    else:
+                        flash("No new meet results for %s ( <strong>%s : %s</strong> ) from<br>'%s'."
+                              % (meet.sanction_number, meet.date, meet.name, filename))
+
+                    if form.update_athletes.data:
+                        athlete_count = 0
+                        for result in meet_data['results']:
                             athlete = Athlete.query.filter_by(id=result['member_id']).first()
                             if athlete:
+                                app.logger.debug("UPDATING athlete bio for %s %s %s"
+                                                 % (athlete.id, athlete.firstname, athlete.lastname))
                                 athlete.snatch = max(athlete.snatch, result['snatch_best'])
                                 athlete.clean_jerk = max(athlete.clean_jerk, result['clean_jerk_best'])
                                 athlete.weight_class = result['weight_class']
                                 athlete.body_weight = result['body_weight']
+                                athlete_count += 1
+                        if athlete_count:
+                            db.session.commit()
+                            flash("UPDATED %s athlete bios." % athlete_count)
+                        flash("No athlete bios to update.")
 
-                        db.session.commit()
-
-                    return redirect(url_for('results'))
-            else:
-                form.csv_file.errors.append('Submitted file is not a CSV file.')
+                return redirect(url_for("results"))
 
     session['meet_year'] = request.args.get('year') or session.get('meet_year', 'all')
     available_years = set([m.date.year for m in Meet.query.all()])

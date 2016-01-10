@@ -31,12 +31,13 @@ from util.tools import (
 
 
 class AddMeetForm(Form):
-    csv_file = FileField('Add Meet CSV', validators=[DataRequired(message='Please choose a file.')])
-    update_athletes = BooleanField('Update Athletes')
+    excel_files = FileField('Add Meet Excel Files', validators=[DataRequired(message='Please choose a file.')])
+    update_athletes = BooleanField('Update Athlete Bios')
 
-    def __init__(self):
-        super(AddMeetForm, self).__init__()
-        self.update_athletes.data = True
+    # def __init__(self):
+    #     super(AddMeetForm, self).__init__()
+    #     self.update_athletes.data = True
+    #       always keeps True even when unchecked! forms.AddMeetForm(update_athletes=True) used instead
 
 
 class AddBioForm(Form):

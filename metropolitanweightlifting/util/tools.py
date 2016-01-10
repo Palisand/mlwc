@@ -17,8 +17,26 @@ import parsedatetime
 
 POUND_KILO_RATIO = 2.2
 
+ALLOWED_EXCEL_SUBTYPES = frozenset(('vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.ms-excel'))
+ALLOWED_EXCEL_MIMETYPES = frozenset('/'.join(('application', st)) for st in ALLOWED_EXCEL_SUBTYPES)
+
 ALLOWED_IMAGE_SUBTYPES = frozenset(('png', 'jpeg'))
 ALLOWED_IMAGE_MIMETYPES = frozenset('/'.join(('image', st)) for st in ALLOWED_IMAGE_SUBTYPES)
+
+FAIL_GIFS = {
+    0: '/static/image/fail_gifs/olympics_1.gif',
+    1: '/static/image/fail_gifs/olympics_2.gif',
+    2: '/static/image/fail_gifs/olympics_3.gif',
+}
+
+RESIZED_FILENAME_JPG_FORMAT = '{}_{}.jpg'
+IMAGEMAGICK_PROCESS_TIMEOUT = 20
+ImageSize = namedtuple('ImageSize', ['name', 'width', 'height'])
+NORMAL = ImageSize('normal', 120, 120)
+SMALL = ImageSize('small', 24, 24)
+ATHLETE_IMAGE_SIZES = frozenset((NORMAL, SMALL))
+ArticleImageInfo = namedtuple('ArticleImageInfo', ['src', 'caption', 'width', 'height'])
+
 RESULT_LENGTH = 19
 PLACE_TO_DBVAL = {
     'EXTRA': 998,
@@ -28,19 +46,14 @@ WEIGHT_CLASSES = {
     'm': ['56', '62', '69', '77', '85', '94', '105', '105+'],
     'f': ['48', '53', '58', '63', '69', '75', '75+'],
 }
-FAIL_GIFS = {
-    0: '/static/image/fail_gifs/olympics_1.gif',
-    1: '/static/image/fail_gifs/olympics_2.gif',
-    2: '/static/image/fail_gifs/olympics_3.gif',
-}
-RESIZED_FILENAME_JPG_FORMAT = '{}_{}.jpg'
-IMAGEMAGICK_PROCESS_TIMEOUT = 20
-ImageSize = namedtuple('ImageSize', ['name', 'width', 'height'])
-NORMAL = ImageSize('normal', 120, 120)
-SMALL = ImageSize('small', 24, 24)
-ATHLETE_IMAGE_SIZES = frozenset((NORMAL, SMALL))
-ArticleImageInfo = namedtuple('ArticleImageInfo', ['src', 'caption', 'width', 'height'])
+MeetAttr = namedtuple('MeetAttr', ['name', 'row', 'column_range'])
+MEET_ATTR_SANCTION_NUMBER = MeetAttr('Sanction Number', 11, range(13, 20))
+MEET_ATTR_NAME = MeetAttr('Competition Name', 10, range(4, 10))
+MEET_ATTR_DATE = MeetAttr('Date', 11, range(4, 6))
+MEET_ATTR_LOCATION = MeetAttr('Location', 10, range(15, 20))
 SANCTION_NUMBER_DIGITS = 6
+DATE_STRING_FORMAT = "%Y-%m-%d"
+MEET_RESULTS_ROW_RANGE = range(15, 36)
 
 
 class LastUpdatedOrderedDict(OrderedDict):
@@ -74,6 +87,10 @@ def allowed_image_type(image_file):
     return image_file.mimetype in ALLOWED_IMAGE_MIMETYPES
 
 
+def allowed_excel_type(excel_file):
+    return excel_file.mimetype in ALLOWED_EXCEL_MIMETYPES
+
+
 def can_wrap_text(image):
     """
     This may be subject to change...
@@ -85,11 +102,16 @@ def can_wrap_text(image):
 # PROCESSING #
 # ---------- #
 
-def normalize_place(raw_data):
-    place = raw_data.upper().strip()
-    if place.isdigit():
-        return int(place)
-    return PLACE_TO_DBVAL[place]
+def normalize_place(raw):
+    """
+    A valid place is "EXTRA", "", or a positive integer.
+    """
+    if isinstance(raw, float):
+        if raw > 0:
+            return int(raw)
+    elif raw.upper() == "EXTRA" or raw == "":
+        return PLACE_TO_DBVAL[raw.upper().strip()]
+    raise Exception("Invalid place '%s'." % raw)
 
 
 def resize_image(original_filename, new_filename, size):
@@ -244,83 +266,86 @@ def get_video_source(data):
     return re.search(r'(?<=src=\")(.*?)(?=\")', data).group()
 
 
-def get_meet_dict_from_csv(csv_file):
+def get_meet_attribute_value(meet_attr, sheet):
+    for col in meet_attr.column_range:
+        value = sheet[meet_attr.row, col]
+        if value:
+            if isinstance(value, basestring) and not value.strip():  # in case of white space str
+                continue
+            else:
+                return value
+    raise Exception("%s not found." % meet_attr.name)
+
+
+def get_meet_dict_from_excel_sheet(sheet):
     """
-    Converts a csv file of meet information into a usable dict
+    Converts an excel file of meet information into a usable dict
 
-    File format:
-
-    sanction number (containing 6 numbers; http://www.teamusa.org/usa-weightlifting/resources/all-meet-results)
-    name
-    date (human readable)
-    city, state
-    (0) lot number, (1) gender, (2) member id, (3) division, (4) weight class, (5) name, (6) year of birth, \
-        (7) team, (8) body weight, (9) snatch 1, (10) 2, (11) 3, (12) best, \
-        (13) clean and jerk 1, (14) 2, (15) 3, (16) best, (17) total, (18) place
-    ...
-
-    NOTE: after 'city, state', empty lines are allowed
-
-    :param csv_file: comma-separated values file
-    :return: a dictionary representing a single meet
+    :type sheet: pyexcel.Sheet
+    :return:
     """
-    csv_file.seek(0)
     meet_info = dict()
     # sanction number
-    meet_info['sanction_number'] = re.sub('\D', '', csv_file.readline().strip())
-    if len(meet_info['sanction_number']) != SANCTION_NUMBER_DIGITS:
-        raise Exception("Invalid sanction number.")
+    sanction_number = get_meet_attribute_value(MEET_ATTR_SANCTION_NUMBER, sheet).replace('-', '')
+    if len(sanction_number) == SANCTION_NUMBER_DIGITS:
+        meet_info['sanction_number'] = sanction_number
+    else:
+        raise Exception("Invalid sanction number '%s'." % sanction_number)
     # name
-    meet_info['name'] = csv_file.readline().rstrip()
+    meet_info['name'] = get_meet_attribute_value(MEET_ATTR_NAME, sheet)
     # date
-    date_line = csv_file.readline().rstrip()
-    cal = parsedatetime.Calendar()
-    time_struct, parse_status = cal.parse(date_line)
-    if parse_status != 1:
-        raise Exception("Unable to parse date from: %s" % date_line)
-    d = datetime.fromtimestamp(mktime(time_struct))
-    meet_info['date'] = date(d.year, d.month, d.day)
-    # d = [int(i) for i in csv_file.readline().rstrip().split('-')]
-    # try:
-    #     meet_info['date'] = date(d[0], d[1], d[2])
-    # except IndexError:
-    #     raise Exception("Invalid date format: %s" % meet_info['date'])
-    # ===========
-    # city, state
-    location = csv_file.readline().split(',')
-    meet_info['city'] = location[0].title()
-    meet_info['state'] = location[1].upper().strip()
+    meet_date = get_meet_attribute_value(MEET_ATTR_DATE, sheet)
+    if isinstance(meet_date, date):
+        meet_info['date'] = get_meet_attribute_value(MEET_ATTR_DATE, sheet)
+    else:
+        raise Exception("Date '%s' is not an Excel date type." % meet_date)
+    # location
+    try:
+        location_raw = get_meet_attribute_value(MEET_ATTR_LOCATION, sheet)
+        location = location_raw.split(",")
+        assert(len(location) == 2)
+    except (AttributeError, AssertionError) as e:
+        raise Exception("Incorrect formatting for meet location '%s', "
+                        "please use 'city, state' in a single Excel cell." % location_raw)
+    else:
+        meet_info['city'] = location[0].strip().title()
+        meet_info['state'] = location[1].strip().upper()  # Assuming 'NY' format
     # results
     meet_info['results'] = list()
-    for line in csv_file:
-        result = line.split(',')
-        result_length = len(filter(lambda r: bool(r.strip()), result))
-        if result_length:  # if not an empty line (,,,)
+    for row_num in MEET_RESULTS_ROW_RANGE:
+        row = sheet.row[row_num]
+        if row[0]:  # if value for Lot No.
             try:
-                if result[1].lower() not in ['m', 'f']:
-                    raise Exception("Invalid gender '%s' (not 'm' or 'f') in line: '%s'" % (result[1], line))
-                if result[4] not in WEIGHT_CLASSES['m'] and  \
-                   result[4] not in WEIGHT_CLASSES['f']:
-                    raise Exception("Invalid weight class '%s' in line: '%s'" % (result[4], line))
+                # gender check
+                if row[1].lower() not in ['m', 'f']:
+                    raise Exception("Invalid gender value '%s' (not 'm' or 'f')" % row[1])
+                # weight class check
+                weight_class = str(int(row[4])) if isinstance(row[4], float) else str(row[4])
+                if weight_class not in WEIGHT_CLASSES['m'] and \
+                   weight_class not in WEIGHT_CLASSES['f']:
+                    raise Exception("Invalid weight class '%s'" % weight_class)
+                # add result data
                 meet_info['results'].append({
-                    'gender': result[1].lower(),
-                    'member_id': result[2],
-                    'weight_class': result[4],
-                    'name': result[5].title(),
-                    'body_weight': float(result[8]),
-                    'snatch_1': int(result[9]),
-                    'snatch_2': int(result[10]),
-                    'snatch_3': int(result[11]),
-                    'snatch_best': int(result[12]),
-                    'clean_jerk_1': int(result[13]),
-                    'clean_jerk_2': int(result[14]),
-                    'clean_jerk_3': int(result[15]),
-                    'clean_jerk_best': int(result[16]),
-                    'total': int(result[17]),
-                    'place': normalize_place(result[18])
+                    'gender': row[1].lower(),
+                    'member_id': int(row[2]),
+                    'weight_class': weight_class,
+                    'name': row[5].title(),
+                    'body_weight': float(row[8]),
+                    'snatch_1': int(row[9]),
+                    'snatch_2': int(row[10]),
+                    'snatch_3': int(row[11]),
+                    'snatch_best': int(row[12]),
+                    'clean_jerk_1': int(row[13]),
+                    'clean_jerk_2': int(row[14]),
+                    'clean_jerk_3': int(row[15]),
+                    'clean_jerk_best': int(row[16]),
+                    'total': int(row[17]),
+                    'place': normalize_place(row[18])
                 })
             except IndexError:
-                raise Exception("Missing item in line: '%s'" % line)
+                raise Exception("Missing item in row %s" % (row_num + 1))
+            except Exception as e:
+                raise Exception("Error in row %s: %s" % (row_num + 1, e))
     return meet_info
 
 
