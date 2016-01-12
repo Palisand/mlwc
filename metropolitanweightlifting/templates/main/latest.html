@@ -42,7 +42,11 @@
 
 {% if article %}
     <h1>
-        <a href="{{ url_for('articles', article_id=article.id) }}">
+        <a {% if article.pdf_src %}
+            target="_blank" href="{{ url_for('static', filename='pdf/' ~ article.pdf_src) }}"
+        {% else %}
+            href="{{ url_for('articles', article_id=article.id) }}"
+        {% endif %}>
             {{ article.title }}
         </a>
     </h1>
@@ -50,13 +54,13 @@
 {% endif %}
 
 {% if latest_meet %}
-    <h1>Latest Meet</h1>
-    <h2>
+    <h1>Latest Meet Results</h1>
+    <h3>
         {{ latest_meet.date }} :
         <a href="{{ url_for('results', meet_id=latest_meet.id) }}">
             {{ latest_meet.name }}
         </a>
-    </h2>
+    </h3>
 {% endif %}
 
 {% endblock %}

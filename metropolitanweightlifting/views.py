@@ -46,12 +46,6 @@ def index():
                            results=meet_results)
 
 
-@app.route('/calendar')
-def calendar():
-    iframe_src = "https://www.google.com/calendar/embed?src=metropolitanweightlifting%40gmail.com&ctz=America/New_York"
-    return render_template('main/calendar.html', src=iframe_src)
-
-
 @app.route('/results/', methods=['GET', 'POST'])
 @app.route('/results/<int:meet_id>', methods=['GET', 'POST'])
 def results(meet_id=None):
@@ -173,7 +167,8 @@ def results(meet_id=None):
                         if athlete_count:
                             db.session.commit()
                             flash("UPDATED %s athlete bios." % athlete_count)
-                        flash("No athlete bios to update.")
+                        else:
+                            flash("No athlete bios to update.")
 
                 return redirect(url_for("results"))
 

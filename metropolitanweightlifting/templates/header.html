@@ -5,8 +5,28 @@
 {#                <img class="logo" src="{{ url_for('static', filename='image/logo.png') }}">#}
 {#            </a>#}
 {#        </span>#}
-        <h1 class="header-heading" onclick="dropdownMenu();">
-            Metropolitan Local Weightlifting Committee
-        </h1>
+        <h3 class="header-heading">
+            <span id="header-text">Metropolitan Local Weightlifting Committee</span>
+            <span id="mobile-header-text">M L W C</span>
+        </h3>
+        <span id="mobile-nav" onclick="dropdownMenu();">
+            <i class="fa fa-navicon fa-2x"></i>
+        </span>
     </div>
+</div>
+
+<!-- Pull Tabs -->
+<div class="container">
+    <span style="float: right">
+        <a target="_blank" href="https://www.facebook.com/MetropolitanWeightlifting">
+            <div id="facebook-tab" class="pull-tab background-noise">
+                <i class="fa fa-facebook-official fa-2x"></i>
+            </div>
+        </a>
+    </span>
+    <span style="float: right">
+        <div id="calendar-tab" class="pull-tab background-noise">
+            <i class="fa fa-calendar fa-2x"></i>
+        </div>
+    </span>
 </div>

@@ -13,10 +13,10 @@
 <ul style="list-style-type: none; padding-left: 1em;">
     {% for article in articles %}
         <li style="overflow: hidden;">
-            <div style="float: left">
+            <div style="float: left; width: 5em;">
                 {{ article.created_at.strftime('%Y-%m-%d') }}
             </div>
-            <div style="overflow: hidden; padding-left: 1em">
+            <div style="overflow: hidden;">
                 <a {% if article.pdf_src %}
                     target="_blank" href="{{ url_for('static', filename='pdf/' ~ article.pdf_src) }}"
                 {% else %}

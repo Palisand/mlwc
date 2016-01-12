@@ -7,9 +7,6 @@
     <li {% if request.path == url_for('index') %} class="active" {% endif %}>
         <a href="{{ url_for('index') }}">Latest News</a>
     </li>
-    <li {% if request.path == url_for('calendar') %} class="active" {% endif %}>
-        <a href="{{ url_for('calendar') }}">Event Calendar</a>
-    </li>
     <li {% if 'results' in request.path and not page_error %} class="active" {% endif %}>
         <a href="{{ url_for('results') }}">Meet Results</a>
     </li>

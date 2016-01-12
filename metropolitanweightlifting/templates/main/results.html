@@ -36,10 +36,10 @@
 <ul style="list-style-type: none; padding-left: 1em;">
     {% for meet in meets %}
         <li style="overflow: hidden;">
-            <div style="float: left">
+            <div style="float: left; width: 5em">
                 {{ meet.date }}
             </div>
-            <div style="overflow: hidden; padding-left: 1em">
+            <div style="overflow: hidden;">
                 <a href="{{ url_for('results', meet_id=meet.id) }}">{{ meet.name }}</a>
             </div>
         </li>

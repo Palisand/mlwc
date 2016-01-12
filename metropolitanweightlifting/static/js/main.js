@@ -1,6 +1,4 @@
 var WIDTH_LIMIT = 700;
-var TITLE_NORMAL = 'Metropolitan Local Weightlifting Committee';
-var TITLE_SHORT = 'M L W C';
 
 
 $(function() {
@@ -21,19 +19,25 @@ $(function() {
     });
 
     /**
+     * Calendar toggle
+     */
+    $('#calendar-tab').click(
+        function() {
+            $('.calendar').slideToggle("fast", function() {
+                var calendar_iframe = $('iframe', this);
+                if (!calendar_iframe.attr('src')) {
+                    calendar_iframe.attr('src', "https://www.google.com/calendar/embed?src=metropolitanweightlifting%40gmail.com&ctz=America/New_York");
+                }
+            });
+        }
+    );
+
+    /**
      * Window width dependent changes
      */
     windowWidthChanges();
     $(window).resize(function() {
         windowWidthChanges();
-    });
-    $('.header-heading').hover(function() {
-        if ($(window).width() < WIDTH_LIMIT) {
-            $(this).css('cursor', 'pointer');
-        }
-        else {
-            $(this).css('cursor', 'default');
-        }
     });
 
     /**
@@ -169,14 +173,6 @@ function dropdownMenu() {
 
 function windowWidthChanges() {
     $('.dropdown-menu').hide();
-
-    var heading = $('.header-heading');
-    if ($(window).width() < WIDTH_LIMIT) {
-        heading.text(TITLE_SHORT);
-    }
-    else {
-        heading.text(TITLE_NORMAL);
-    }
 }
 
 function articleTypeSwitch(articleTypeValue) {

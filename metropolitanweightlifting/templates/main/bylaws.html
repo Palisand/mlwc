@@ -3,11 +3,11 @@
 {% block content %}
 
     <h1>Bylaws</h1>
+    <div style="margin-bottom: 1em;">
     {% for (article, section) in contents.iteritems() %}
-        <div>
-            <a href="#article_{{ loop.index }}">Article {{ loop.index }}. {{ article }}</a>
-        </div>
+        <div><a href="#article_{{ loop.index }}">Article {{ loop.index }}. {{ article }}</a></div>
     {% endfor %}
+    </div>
 
     {% for (article, sections) in contents.iteritems() %}
         <a class="anchor" id="article_{{ loop.index }}"></a>

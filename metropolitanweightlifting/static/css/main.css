@@ -21,6 +21,14 @@ a:hover {
     color: #682e2e;
 }
 
+label {
+    vertical-align: middle;
+}
+
+select {
+    vertical-align: middle;
+}
+
 .container {
 	max-width: 56em;
 	margin: 0 auto;
@@ -32,7 +40,7 @@ a:hover {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 2;
+    z-index: 4;
     -webkit-box-shadow: 0 0 10px #000000;
     -moz-box-shadow: 0 0 10px #000000;
     box-shadow: 0 0 10px #000000;
@@ -48,25 +56,58 @@ a:hover {
     transition:.25s;
 }
 
+.pull-tab {
+    position: fixed;
+    top: 0;
+    width: 2.5em;
+    text-align: center;
+    padding-top: 4em;
+    padding-bottom: .25em;
+    color: white;
+    -webkit-box-shadow: 0 0 10px #000000;
+    -moz-box-shadow: 0 0 10px #000000;
+    box-shadow: 0 0 10px #000000;
+    background-color: rgb(23, 27, 90);
+    -o-transition:.25s;
+    -moz-transition:.25s;
+    -webkit-transition:.25s;
+    transition:.25s;
+}
+.pull-tab:hover {
+    padding-top: 4.5em;
+    cursor: pointer;
+}
+#facebook-tab {
+    margin-left: -2.5em;
+}
+#calendar-tab {
+    margin-left: -5.5em;
+    z-index: 2;
+}
+
 .anchor {
     display: block;
     position: relative;
-    top: -6.5em;
+    top: -5em;
     visibility: hidden;
 }
 
 .main {
     margin-left: 210px;
-    margin-top: 7em;
+    margin-top: 6em;
     padding-bottom: 65px;
+}
+
+.main h1 {
+    border-bottom: solid gray 1px;
 }
 
 .footer {
 	color: #ffffff;
 	background-color: #000000;
     width: 100%;
-	padding-top: 1em;
-    padding-bottom: 1em;
+	padding-top: 0.5em;
+    padding-bottom: 0.5em;
     position: fixed;
     bottom: 0;
     text-align: right;
@@ -88,9 +129,9 @@ a:hover {
     background-color: rgb(23, 27, 90);
     position: fixed;
     width: 100%;
-    top: 5em;
+    top: 4em;
     bottom: 0;
-    z-index: 1;
+    z-index: 3;
     text-align: center;
     overflow-y: scroll;
 }
@@ -138,7 +179,7 @@ a:hover {
 .holder {
     width: 40px;
     margin-left: -20px;
-    height: 420px; /* blazin */
+    height: 353px;
     position: inherit;
 }
 .stopper {
@@ -156,7 +197,7 @@ a:hover {
     text-align: center;
 }
 .sidebar ul {
-    margin-top: 110px;
+    margin-top: 5em;
 }
 .sidebar ul, li {
     padding-left: 0;
@@ -272,8 +313,21 @@ a:hover {
 }
 
 .calendar {
-    border: 5px solid #ffffff;
-    margin-top: 30px;
+    position: fixed;
+    top: 0;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: none;
+}
+.calendar iframe {
+    width: inherit;
+    height: inherit;
+    padding-top: 6em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .wrap-left {
@@ -353,7 +407,7 @@ a:hover {
 }
 
 .event {
-    background-color: #ffffff;
+    background-color: #d2c8bf;
     margin-bottom: 0.5em;
 }
 .event a {
@@ -545,6 +599,21 @@ a:hover {
 	/*}*/
 /*}*/
 
+.header-heading #header-text {
+    display: block;
+}
+.header-heading #mobile-header-text {
+    display: none;
+}
+
+#mobile-nav {
+    display: none;
+    position: fixed;
+    top: 1em;
+    color: white;
+    cursor: pointer
+}
+
 @media screen and (max-width: 700px) {
     .main {
         margin-left: 0;
@@ -555,8 +624,17 @@ a:hover {
     .header-heading {
         text-align: center;
     }
-    .header-heading:hover {
-        text-shadow: 0 0 10px white;
+    /*.header-heading:hover {*/
+        /*text-shadow: 0 0 10px white;*/
+    /*}*/
+    .header-heading #header-text {
+        display: none;
+    }
+    .header-heading #mobile-header-text {
+        display: block;
+    }
+    #mobile-nav {
+        display: block;
     }
     /*.responsive-iframe-container {*/
         /*position: inherit;*/
