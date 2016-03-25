@@ -106,6 +106,9 @@
         </div>
         <div class="full-width">
             {{ form.pdf.label }}
+            {% if type == 'Edit' %}
+                <div style="float: right; text-decoration: underline;">{{ article.pdf_src }}</div>
+            {% endif %}
             {{ form.pdf }}
             {% if form.pdf.errors %}
                 <ul style="list-style-type: none; padding: 0; margin-top: 0;">

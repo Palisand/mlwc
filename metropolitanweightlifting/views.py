@@ -341,6 +341,15 @@ def edit_article(article_id):
             else:
                 video_src = None
 
+            if form.type.data == 'pdf' and form.pdf.data:
+                try:
+                    pdf_src = save_uploaded_pdf(form.pdf.data)
+                except Exception:
+                    form.pdf.errors.append("Error saving submitted PDF")
+                    return render_template('main/articles_admin.html', form=form, type='Edit')
+                else:
+                    article.pdf_src = pdf_src
+
             article.type = form.type.data
             article.title = form.title.data
             article.body = form.body.data

@@ -37,7 +37,7 @@ class AddMeetForm(Form):
     # def __init__(self):
     #     super(AddMeetForm, self).__init__()
     #     self.update_athletes.data = True
-    #       always keeps True even when unchecked! forms.AddMeetForm(update_athletes=True) used instead
+    # always keeps True even when unchecked! forms.AddMeetForm(update_athletes=True) used instead
 
 
 class AddBioForm(Form):

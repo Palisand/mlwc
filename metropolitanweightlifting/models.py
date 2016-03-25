@@ -95,7 +95,7 @@ class Athlete(db.Model):
 
 class Meet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    sanction_number = db.Column(db.String(6), nullable=False)  # this should be UNIQUE!?
+    sanction_number = db.Column(db.String(8), nullable=False)  # this should be UNIQUE!?
     name = db.Column(db.String, nullable=False)
     date = db.Column(db.Date, nullable=False)
     city = db.Column(db.String)

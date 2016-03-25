@@ -29,14 +29,14 @@
     </div>
 {% endif %}
 
-{#{% if article.pdf_src %}#}
-{#    <div>#}
-{#        <object style="width: 100%; height: 500px" data="{{ url_for('static', filename='pdf/' ~ article.pdf_src) }}" type="application/pdf">#}
-{#            <embed src="{{ url_for('static', filename='pdf/' ~ article.pdf_src) }}" type="application/pdf"></embed>#}
-{#        </object>#}
-{#    </div>#}
-{#{% endif %}#}
-
 <div>
     {{ article.body | markup | safe }}
 </div>
+
+{% if article.pdf_src %}
+    <div>
+        <object style="border: 5px solid #d2c8bf; width: 98%; height: 970px" data="{{ url_for('static', filename='pdf/' ~ article.pdf_src) }}" type="application/pdf">
+            <embed src="{{ url_for('static', filename='pdf/' ~ article.pdf_src) }}" type="application/pdf"></embed>
+        </object>
+    </div>
+{% endif %}
