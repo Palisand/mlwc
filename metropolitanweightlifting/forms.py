@@ -189,10 +189,12 @@ class AddArticleForm(Form):
         if not required_field.data:
             if required_field is self.images and self.article and len(self.article.images.all()):
                 pass
+            elif required_field is self.pdf and self.article and self.article.pdf_src:
+                pass
             else:
                 required_field.errors.append('This field is required.')
 
-        if required_field == self.pdf and 'pdf' not in str(self.pdf.data.mimetype):
+        if required_field.data and required_field is self.pdf and 'pdf' not in str(self.pdf.data.mimetype):
             required_field.errors.append('Invalid file format.')
 
         if not base_validate or required_field.errors: # self.body.errors or self.images.errors or self.video_src.errors or self.pdf.errors:
