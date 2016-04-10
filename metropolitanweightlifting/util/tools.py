@@ -51,7 +51,7 @@ MEET_ATTR_SANCTION_NUMBER = MeetAttr('Sanction Number', 11, range(13, 20))
 MEET_ATTR_NAME = MeetAttr('Competition Name', 10, range(4, 10))
 MEET_ATTR_DATE = MeetAttr('Date', 11, range(4, 6))
 MEET_ATTR_LOCATION = MeetAttr('Location', 10, range(15, 20))
-SANCTION_NUMBER_DIGITS = 8
+SANCTION_NUMBER_DIGITS = 9
 DATE_STRING_FORMAT = "%Y-%m-%d"
 MEET_RESULTS_ROW_RANGE = range(15, 36)
 
