@@ -174,6 +174,19 @@ class MeetResult(db.Model):
         return '<MeetResult %r:%r>' % (self.weight_class, self.place)
 
 
+class Meeting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, nullable=False, unique=True)
+    pdf_src = db.Column(db.String, nullable=False)
+
+    def __init__(self, date, pdf_src):
+        self.date = date
+        self.pdf_src = pdf_src
+
+    def __repr__(self):
+        return '<MeetingMinutes %r>' % self.date
+
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String, nullable=False)
@@ -223,4 +236,5 @@ admin.add_view(AuthModelView(Article, db.session))
 admin.add_view(AuthModelView(ArticleImage, db.session))
 admin.add_view(AuthModelView(Meet, db.session))
 admin.add_view(AuthModelView(MeetResult, db.session))
+admin.add_view(AuthModelView(Meeting, db.session))
 

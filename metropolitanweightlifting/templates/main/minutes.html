@@ -2,7 +2,44 @@
 
 {% block content %}
 
-    <h1>Meeting Minutes</h1>
-    <p>Coming Soon</p>
+<h1>Meeting Minutes</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes"></ul>
+            {% for message in messages %}
+                <li>{{ message|safe }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+{% if current_user.is_authenticated() %}
+    <form method="POST" action="{{ url_for('minutes') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div>{{ form.pdf.label }}</div>
+        <ul style="list-style-type: none; padding-left: 0.5em; margin-top: 0;">
+            <li>{{ form.pdf }}</li>
+            {% for error in form.pdf.errors %}
+                <li class="form-error">{{ error }}</li>
+            {% endfor %}
+            <li>{{ form.date.label }} {{ form.date(id="datepicker", size=10) }}</li>
+            {% for error in form.date.errors %}
+                <li class="form-error">{{ error }}</li>
+            {% endfor %}
+            <li><input type="submit" value="Submit"</li>
+        </ul>
+    </form>
+{% endif %}
+
+<ul style="list-style-type: none; padding-left: 1em;">
+    {% for meeting in meetings %}
+        <li style="overflow: hidden;">
+            <a target="_blank" href="{{ url_for('static', filename='pdf/' ~ meeting.pdf_src) }}">
+                {{ meeting.date }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
 
 {% endblock %}

@@ -20,6 +20,7 @@ def init_debug():
 def dropdb():
     if prompt_bool("Drop database?"):
         db.drop_all()
+        print "All tables dropped."
 
 
 @manager.option('-f', '--firstname', dest='firstname', default=None)

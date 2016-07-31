@@ -1,7 +1,7 @@
 from metropolitanweightlifting import app, db, login_manager  # bcrypt
 
 import forms
-from models import Athlete, User, Meet, MeetResult, Article, ArticleImage
+from models import Athlete, User, Meet, MeetResult, Article, ArticleImage, Meeting
 from util import events
 from util.tools import (
     get_formatted_meet_results,
@@ -380,9 +380,29 @@ def edit_article(article_id):
                            delete_form=delete_form, article=article)
 
 
-@app.route('/minutes')
+@app.route('/minutes', methods=['GET', 'POST'])
 def minutes():
-    return render_template('main/minutes.html')
+    form = forms.AddMeetingForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        if Meeting.query.filter_by(date=form.date.data).first():
+            form.date.errors.append("Meeting Minutes for this date already exist.")
+            return redirect(url_for('minutes'))
+
+        try:
+            pdf_src = save_uploaded_pdf(form.pdf.data)
+        except Exception:
+            form.pdf.errors.append("Error saving submitted PDF")
+            return redirect(url_for('minutes'))
+
+        meeting = Meeting(
+            form.date.data,
+            pdf_src
+        )
+        db.session.add(meeting)
+        db.session.commit()
+
+    meetings = Meeting.query.order_by(db.desc(Meeting.date)).all()
+    return render_template('main/minutes.html', form=form, meetings=meetings)
 
 
 @app.route('/bylaws')

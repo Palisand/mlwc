@@ -81,7 +81,7 @@ select {
     margin-left: -2.5em;
 }
 #calendar-tab {
-    margin-left: -5.5em;
+    margin-left: -2.5em;
     z-index: 2;
 }
 
@@ -588,6 +588,25 @@ select {
 
 .span_1_of_12 {
   	width: 6.866%;
+}
+
+/* JQuery UI */
+
+div#ui-datepicker-div.ui-datepicker.ui-widget.ui-widget-content.ui-helper-clearfix.ui-corner-all {
+    font-family: Oswald, sans-serif;
+    font-size: 1em;
+}
+
+#ui-datepicker-div.ui-widget-content {
+    background:  #ccc1b8;
+}
+
+a.ui-state-default.ui-state-active {
+    background: #baafa6;
+}
+
+a.ui-state-default.ui-state-highlight {
+    background: #e8ddd4;
 }
 
 /*/!*  GO FULL WIDTH BELOW 480 PIXELS *!/*/

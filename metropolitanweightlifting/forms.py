@@ -1,4 +1,5 @@
 from models import Athlete
+from flask.ext.admin.form import widgets
 from flask.ext.wtf import Form
 from wtforms import (
     StringField,
@@ -9,6 +10,7 @@ from wtforms import (
     FloatField,
     IntegerField,
     BooleanField,
+    DateField
 )
 from wtforms.validators import (
     DataRequired,
@@ -23,12 +25,20 @@ from util.tools import (
 )
 
 
-# class AddMinutesForm(Form):
-#     pdf_file = FileField(validators=DataRequired())
-#     date
-#     title
-#     content
+class AddMeetingForm(Form):
+    pdf = FileField('PDF File', validators=[DataRequired(message='Please choose a file.')])
+    date = DateField(format='%m/%d/%Y', validators=[DataRequired()])
 
+    def validate(self):
+        base_validate = super(AddMeetingForm, self).validate()
+
+        if self.pdf.data and 'pdf' not in str(self.pdf.data.mimetype):
+            self.pdf.errors.append('Invalid file format.')
+
+        if not base_validate or self.pdf.errors:
+            return False
+
+        return True
 
 class AddMeetForm(Form):
     excel_files = FileField('Add Meet Excel Files', validators=[DataRequired(message='Please choose a file.')])
