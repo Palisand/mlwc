@@ -95,7 +95,7 @@ select {
 .main {
     margin-left: 210px;
     margin-top: 6em;
-    padding-bottom: 65px;
+    padding-bottom: 2.5em;
 }
 
 .main h1 {
@@ -482,8 +482,14 @@ select {
 .slick-track {
     height: 350px;
 }
+
 .slick-slide {
     text-align: center;
+}
+
+.slick-slider,
+.image-carousel {
+    margin-bottom: 0;
 }
 
 .slick-slide::before {

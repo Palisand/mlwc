@@ -53,7 +53,7 @@ class ArticleImage(db.Model):
 
 
 class Athlete(db.Model):
-    id = db.Column(db.Integer, primary_key=True)  # USA Weightlifting ID
+    id = db.Column(db.Integer, primary_key=True)  # USA Weightlifting ID preferred
     gender = db.Column(db.Enum('m', 'f'), nullable=False)
     firstname = db.Column(db.String, nullable=False)
     lastname = db.Column(db.String, nullable=False)
@@ -78,7 +78,8 @@ class Athlete(db.Model):
                  clean_jerk,
                  description,
                  has_photo):
-        self.id = id
+        if id:
+            self.id = id
         self.gender = gender
         self.firstname = firstname
         self.lastname = lastname
