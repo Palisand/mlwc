@@ -40,6 +40,7 @@ class AddMeetingForm(Form):
 
         return True
 
+
 class AddMeetForm(Form):
     excel_files = FileField('Add Meet Excel Files', validators=[DataRequired(message='Please choose a file.')])
     update_athletes = BooleanField('Update Athlete Bios')
@@ -90,7 +91,8 @@ class AddBioForm(Form):
         ('63', '63 kg (139 lb)'),
         ('69', '69 kg (152 lb)'),
         ('75', '75 kg (165 lb)'),
-        ('75+', '75 kg+ (165 lb+)'),
+        ('90', '90 kg (198 lb)'),
+        ('90+', '90 kg+ (198 lb+)'),
     ])
     photo = FileField('Photo', validators=[Optional()])
     description = TextAreaField('Description', validators=[Optional()])
@@ -264,7 +266,8 @@ class FilterAthletesForm(Form):
         ('63', '63 kg (139 lb)'),
         ('69', '69 kg (152 lb)'),
         ('75', '75 kg (165 lb)'),
-        ('75+', '75 kg+ (165 lb+)'),
+        ('90', '90 kg (198 lb)'),
+        ('90+', '90 kg+ (198 lb+)'),
     ])
     sort_by = SelectField('Sort By', choices=[
         ('name', 'Name'),

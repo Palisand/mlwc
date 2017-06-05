@@ -248,7 +248,8 @@ def add_article():
         if form.type.data == 'pdf':
             try:
                 pdf_src = save_uploaded_pdf(form.pdf.data)
-            except Exception:
+            except Exception as e:
+                app.logger.exception("Failed to save PDF file.")
                 form.pdf.errors.append("Error saving submitted PDF")
                 return render_template('main/articles_admin.html', form=form, type='Add')
         else:

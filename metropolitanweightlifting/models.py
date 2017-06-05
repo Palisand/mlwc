@@ -60,7 +60,7 @@ class Athlete(db.Model):
     body_weight = db.Column(db.Float)
     weight_class = db.Column(db.Enum(
         '56', '62', '69', '77', '85', '94', '105', '105+',
-        '48', '53', '58', '63', '69', '75', '75+'
+        '48', '53', '58', '63', '69', '75', '90', '90+'
     ), nullable=False)
     snatch = db.Column(db.Integer, nullable=False)
     clean_jerk = db.Column(db.Integer, nullable=False)
@@ -118,7 +118,7 @@ class MeetResult(db.Model):
     member_id = db.Column(db.Integer, nullable=False)
     weight_class = db.Column(db.Enum(
         '56', '62', '69', '77', '85', '94', '105', '105+',
-        '48', '53', '58', '63', '69', '75', '75+'
+        '48', '53', '58', '63', '69', '75', '75+', '90', '90+'  # 75+ for old meet results
     ), nullable=False)
     place = db.Column(db.Integer)
     name = db.Column(db.String)

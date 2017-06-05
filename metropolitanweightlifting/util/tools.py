@@ -44,7 +44,7 @@ PLACE_TO_DBVAL = {
 }
 WEIGHT_CLASSES = {
     'm': ['56', '62', '69', '77', '85', '94', '105', '105+'],
-    'f': ['48', '53', '58', '63', '69', '75', '75+'],
+    'f': ['48', '53', '58', '63', '69', '75', '75+', '90', '90+'],  # 75+ left for old meets
 }
 MeetAttr = namedtuple('MeetAttr', ['name', 'row', 'column_range'])
 MEET_ATTR_SANCTION_NUMBER = MeetAttr('Sanction Number', 11, range(13, 20))
