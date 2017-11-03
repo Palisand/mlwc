@@ -287,10 +287,10 @@ def get_meet_dict_from_excel_sheet(sheet):
     meet_info = dict()
     # sanction number
     sanction_number = get_meet_attribute_value(MEET_ATTR_SANCTION_NUMBER, sheet).replace('-', '')
-    if len(sanction_number) == SANCTION_NUMBER_DIGITS:
+    if len(sanction_number) <= SANCTION_NUMBER_DIGITS:
         meet_info['sanction_number'] = sanction_number
     else:
-        raise Exception("Invalid sanction number '%s'." % sanction_number)
+        raise Exception("Invalid sanction number '%s' is greater than %s." % (sanction_number, SANCTION_NUMBER_DIGITS))
     # name
     meet_info['name'] = get_meet_attribute_value(MEET_ATTR_NAME, sheet)
     # date
